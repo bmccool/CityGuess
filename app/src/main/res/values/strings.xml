@@ -6,4 +6,6 @@
     <string name="continue_message">City</string>
     <string name="last_guess_distance"></string>
     <string name="title_activity_game_over">GameOver</string>
+    <string name="game_over_text"></string>
+    <string name="title_activity_options">OptionsActivity</string>
 </resources>

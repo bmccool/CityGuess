@@ -2,6 +2,7 @@ package mccool.brendon.cityguess;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -28,6 +29,7 @@ import java.util.List;
 public class ContinueGameActivity extends AppCompatActivity {
     public final static String GUESS_CITY = "mccool.brendon.cityguess.GUESS_CITY";
     public final static String GUESS_DISTANCE = "mccool.brendon.cityguess.GUESS_DISTANCE";
+    public final static String GAME_OVER = "mccool.brendon.cityguess.GAME_OVER";
     private String searchConstant1 = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=";
     private String secretCity2     = "Fort+Wayne,+IN";
     private String searchConstant3 = "&destinations=";
@@ -52,7 +54,16 @@ public class ContinueGameActivity extends AppCompatActivity {
         // Set the secret city string so that the next guess can be executed
         secretCity2 = intent.getStringExtra(NewGameActivity.SECRET_CITY);
 
+        // What does this actually do??? idk
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (distance == null || distance.isEmpty()) {
+            // THIS IS A NEW GAME
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("Current Game", "NEW GAME");
+            editor.commit();
+        }
     }
 
     /** Called when the user clicks the Enter button */
@@ -64,9 +75,6 @@ public class ContinueGameActivity extends AppCompatActivity {
 
         // Format the string
         guessCity4 = guess.replace(' ', '+');
-        Log.d("APP", "FORMATTED GUESS IS " + guessCity4);
-        Log.d("APP", "FORMATTED CITY  IS " + secretCity2);
-
 
         // Check the network connection
         ConnectivityManager connMgr =
@@ -85,9 +93,26 @@ public class ContinueGameActivity extends AppCompatActivity {
     public void checkGuess(String string) {
         Log.d("CHECKGUESS", "STRING IS: " + string);
         Intent intent;
+
+        // Add this guess to this game's gueses
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        String thisGame = sharedPref.getString("Current Game", "NEW GAME");
+        if (thisGame.equals("NEW GAME")) {
+            thisGame = string;
+        } else {
+            thisGame = thisGame + string;
+        }
+        Log.d("SHARED PREFERENCES", "THIS GAME: " + thisGame);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("Current Game", thisGame);
+        editor.commit();
+
+        // Check if this guess is correct (it should transition to game over)
         if (string.contains(" ft")) {
             // GUESS IS CORRECT, game over
             intent = new Intent(this, GameOverActivity.class);
+            intent.putExtra(ContinueGameActivity.GAME_OVER, thisGame);
         } else {
             // GUESS IS INCORRECT, Continue game
             intent = new Intent(this, ContinueGameActivity.class);
@@ -95,6 +120,11 @@ public class ContinueGameActivity extends AppCompatActivity {
             intent.putExtra(GUESS_DISTANCE, string);
         }
 
+
+
+
+        // Start the next activity and finish this one
+        // Secret city is continually passed along to the next activity
         intent.putExtra(NewGameActivity.SECRET_CITY, secretCity2);
         startActivity(intent);
         finish();
@@ -244,7 +274,7 @@ public class ContinueGameActivity extends AppCompatActivity {
                     }
                 }
             }
-            return destination + "\n" + distance;
+            return "{" + destination + "}, {" + distance + "},\n";
         }
     }
 }

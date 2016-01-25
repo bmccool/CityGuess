@@ -47,6 +47,18 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /** Called when the user clicks the Options button */
+    public void startOptions(View view) {
+            Intent intent = new Intent(this, OptionsActivity.class);
+            startActivity(intent);
+    }
+
+    /** Called when the user clicks the HighScores button */
+//    public void startNewGame(View view) {
+//            Intent intent = new Intent(this, NewGameActivity.class);
+//            startActivity(intent);
+//    }
+
     // Public getter for cities
     public static String getCity(int index) {
         return CITIES[index];

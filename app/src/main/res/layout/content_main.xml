@@ -22,8 +22,9 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Options" />
-    <!-- android:onClick="" // The value for this attribute must be the name of the method to call. -->
+        android:text="Options"
+        android:onClick="startOptions" />
+
 
     <Button
         android:layout_width="match_parent"
